@@ -3,6 +3,9 @@ package com.mlog.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 
 public class Utils {
 
@@ -58,4 +61,37 @@ public class Utils {
 
         return list;
     }
+
+    public static String objectToJsonStr(Object object) {
+        if (object == null) {
+            return null;
+        }
+
+        String jsonStr = null;
+        try {
+            Gson gson = new GsonBuilder().create();
+            jsonStr = gson.toJson(object);
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return jsonStr;
+    }
+
+    public static <T> Object jsonStrToObject(String jsonStr, Class<T> classType) {
+        if (jsonStr == null) {
+            return null;
+        }
+
+        Object object = null;
+        try {
+            Gson gson = new GsonBuilder().create();
+            object = gson.fromJson(jsonStr, classType);
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return object;
+    }
+
 }
