@@ -1,6 +1,7 @@
 package com.mlog.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -78,7 +79,7 @@ public class Utils {
         return jsonStr;
     }
 
-    public static <T> Object jsonStrToObject(String jsonStr, Class<T> classType) {
+    public static Object jsonStrToObject(String jsonStr) {
         if (jsonStr == null) {
             return null;
         }
@@ -86,12 +87,11 @@ public class Utils {
         Object object = null;
         try {
             Gson gson = new GsonBuilder().create();
-            object = gson.fromJson(jsonStr, classType);
+            object = gson.fromJson(jsonStr, new HashMap<String, Object>().getClass());
         } catch (Exception e) {
             e.getStackTrace();
         }
 
         return object;
     }
-
 }
