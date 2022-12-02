@@ -104,7 +104,7 @@ public class Utils {
 
         String name = ManagementFactory.getRuntimeMXBean().getName();
         if (name != null) {
-            processId = Integer.valueOf(name.split("@")[0]);
+            processId = Integer.valueOf(name.split("\\@")[0]);
         }
 
         return processId;
@@ -132,5 +132,36 @@ public class Utils {
         }
 
         return result;
+    }
+    public static String nvl(String target, String replace) {
+        if (target == null) {
+            return replace;
+        }
+
+        return target;
+    }
+
+    public static Object nvl(Object target, Object replace) {
+        if (target == null) {
+            return replace;
+        }
+
+        return target;
+    }
+
+    public static String nvl2(String target, String replace1, String replace2) {
+        if (target == null) {
+            return replace1;
+        }
+
+        return replace2;
+    }
+
+    public static Object nvl2(Object target, Object replace1, Object replace2) {
+        if (target == null) {
+            return replace1;
+        }
+
+        return replace2;
     }
 }
