@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.management.ManagementFactory;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -174,7 +176,6 @@ public class Utils {
         }
 
         String convert = String.format("%-" + size + "s", target).replace(" ", pad);
-
         return convert;
     }
 
@@ -184,8 +185,13 @@ public class Utils {
         }
 
         String convert = String.format("%"  + size + "s", target).replace(" ", pad);
-
         return convert;
+    }
+
+    public static String currentDate(String format) {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern(format));
+
+        return date;
     }
 
 }
