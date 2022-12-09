@@ -133,6 +133,7 @@ public class Utils {
 
         return result;
     }
+
     public static String nvl(String target, String replace) {
         if (target == null) {
             return replace;
@@ -145,6 +146,8 @@ public class Utils {
         if (target == null) {
             return replace;
         }
+
+        System.out.println("nvl");
 
         return target;
     }
@@ -164,4 +167,25 @@ public class Utils {
 
         return replace2;
     }
+
+    public static String rpad(String target, int size, String pad){
+        if (target == null) {
+            return "";
+        }
+
+        String convert = String.format("%-" + size + "s", target).replace(" ", pad);
+
+        return convert;
+    }
+
+    public static String lpad(String target, int size, String pad){
+        if (target == null) {
+            return "";
+        }
+
+        String convert = String.format("%"  + size + "s", target).replace(" ", pad);
+
+        return convert;
+    }
+
 }
