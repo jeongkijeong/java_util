@@ -3,9 +3,7 @@ package com.mlog.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,8 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class Utils {
+
+    private static Properties properties = null;
 
     public static String replace(String target, List<Map<String, String>> variableList) {
         if (target == null || variableList == null)
@@ -149,8 +150,6 @@ public class Utils {
             return replace;
         }
 
-        System.out.println("nvl");
-
         return target;
     }
 
@@ -193,5 +192,36 @@ public class Utils {
 
         return date;
     }
+
+    public static int loadProperties(String path) {
+        int result = -1;
+
+        File file = new File(path);
+        if (!file.exists()) {
+            return result;
+        }
+
+        try (FileInputStream fis = new FileInputStream(path)) {
+            properties = new Properties();
+            properties.load(fis);
+
+            result = 0;
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return result;
+    }
+
+    public static Object getProterty(String key) {
+        Object value = null;
+
+        if (properties != null) {
+            value = properties.get(key);
+        }
+
+        return value;
+    }
+
 
 }
