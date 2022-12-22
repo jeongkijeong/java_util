@@ -15,6 +15,7 @@ import java.util.Properties;
 
 public class Utils {
 
+
     private static Properties properties = null;
 
     public static String replace(String target, List<Map<String, String>> variableList) {
@@ -118,6 +119,8 @@ public class Utils {
 
         File file = new File(path);
         if (!file.exists()) {
+            System.out.println("file not exist " + path);
+
             return result;
         }
 
@@ -213,15 +216,37 @@ public class Utils {
         return result;
     }
 
-    public static Object getProterty(String key) {
-        Object value = null;
+    public static String getProterty(String key) {
+        String value = null;
 
         if (properties != null) {
-            value = properties.get(key);
+            value = (String) nvl(properties.get(key), "");
         }
 
         return value;
     }
 
+    public static Object jsonFileToObject(String path) {
+        String string = fileToString(path);
 
+        Object object = null;
+        try {
+            Gson gson = new GsonBuilder().create();
+            object = gson.fromJson(string, new HashMap<String, Object>().getClass());
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        return object;
+    }
+
+    public static Properties mapToProperties(Map<String, Object> map) {
+        Properties properties = new Properties();
+
+        for (String key : map.keySet()) {
+            properties.setProperty(key, (String) map.get(key));
+        }
+
+        return properties;
+    }
 }
