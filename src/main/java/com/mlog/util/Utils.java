@@ -2,19 +2,17 @@ package com.mlog.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class Utils {
-
+    private static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     private static Properties properties = null;
 
@@ -98,6 +96,7 @@ public class Utils {
             object = gson.fromJson(result, new HashMap<String, Object>().getClass());
         } catch (Exception e) {
             e.getStackTrace();
+            logger.error("", e);
         }
 
         return object;
@@ -234,7 +233,7 @@ public class Utils {
             Gson gson = new GsonBuilder().create();
             object = gson.fromJson(string, new HashMap<String, Object>().getClass());
         } catch (Exception e) {
-            e.getStackTrace();
+            logger.error("", e);
         }
 
         return object;
@@ -248,5 +247,42 @@ public class Utils {
         }
 
         return properties;
+    }
+
+    public void mergeFile(String sourceFilePath, String targetFilePath) {
+        File sourceFile = new File(sourceFilePath);
+        File targetFile = new File(targetFilePath);
+
+        try {
+            String line = "";
+
+            if (targetFile.exists() == true) {  // 대상파일 존재시 내용추가.
+                FileWriter fileWriter = new FileWriter(targetFile, true);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFile)));
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+                int count = 0;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (count == 0) {
+                        count++;
+
+                        continue;
+                    }
+
+                    bufferedWriter.write(line);
+                    bufferedWriter.write("\n");
+                }
+
+                bufferedWriter.flush();
+                bufferedReader.close();
+                bufferedWriter.close();
+            } else {
+                sourceFile.renameTo(targetFile);
+            }
+
+            sourceFile.delete();
+        } catch (Exception e) {
+            logger.error("", e);
+        }
     }
 }
