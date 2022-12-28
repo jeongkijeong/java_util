@@ -1,5 +1,7 @@
 package com.mlog.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
@@ -7,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -85,22 +87,43 @@ public class Utils {
         return result;
     }
 
-    public static Object jsonStrToObject(String result) {
+    public static <T> Object jsonStrToObject(String result, Class<T> classType) {
+        Object jsonObj = null;
+
+        if (result == null) {
+            return jsonObj;
+        }
+
+        try {
+            Gson gson = new GsonBuilder().create();
+            jsonObj = gson.fromJson(result, classType);
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+
+        return jsonObj;
+    }
+
+    public static Map<String, Object> jsonStrToMap(String result) {
+        Map<String, Object> jsonMap = new HashMap<String, Object>();
         if (result == null) {
             return null;
         }
 
-        Object object = null;
         try {
-            Gson gson = new GsonBuilder().create();
-            object = gson.fromJson(result, new HashMap<String, Object>().getClass());
+            ObjectMapper mapper = new ObjectMapper();
+            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+            };
+
+            jsonMap = mapper.readValue(result, typeRef);
         } catch (Exception e) {
-            e.getStackTrace();
             logger.error("", e);
+            return null;
         }
 
-        return object;
+        return jsonMap;
     }
+
 
     public static int getProcessId() {
         int processId = -1;
@@ -190,7 +213,7 @@ public class Utils {
     }
 
     public static String currentDate(String format) {
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern(format));
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern(format));
 
         return date;
     }
@@ -239,11 +262,24 @@ public class Utils {
         return object;
     }
 
+    public static Map<String, Object> jsonFileToMap(String path) {
+        Map<String, Object> jsonMap = null;
+
+        try {
+            jsonMap = jsonStrToMap(fileToString(path));
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+
+        return jsonMap;
+    }
+
     public static Properties mapToProperties(Map<String, Object> map) {
         Properties properties = new Properties();
 
         for (String key : map.keySet()) {
-            properties.setProperty(key, (String) map.get(key));
+//            properties.setProperty(key, (String) map.get(key));
+            properties.setProperty(key, map.get(key).toString());
         }
 
         return properties;
