@@ -12,6 +12,7 @@ import java.lang.management.ManagementFactory;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Utils {
     private static Logger logger = LoggerFactory.getLogger(Utils.class);
@@ -321,4 +322,17 @@ public class Utils {
             logger.error("", e);
         }
     }
+
+    public List<Map<String, String>> matchedList (List<Map<String, String>> sourceList, List<Map<String, String>> targetList, String key) {
+        List<Map<String, String>> t = sourceList.stream().filter(target -> targetList.stream().anyMatch(source -> source.get(key).equals(target.get(key)))).collect(Collectors.toList());
+
+        return t;
+    }
+
+    public List<Map<String, String>> removedList (List<Map<String, String>> sourceList, List<Map<String, String>> targetList, String key) {
+        sourceList.removeIf(target -> targetList.stream().anyMatch(source -> source.get(key).equals(target.get(key))));
+
+        return sourceList;
+    }
+
 }
