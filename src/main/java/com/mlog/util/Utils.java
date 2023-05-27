@@ -1,5 +1,8 @@
 package com.mlog.util;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -9,6 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -239,6 +245,21 @@ public class Utils {
         return result;
     }
 
+    public static int loadLogConfigs(String path) {
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        JoranConfigurator configurator = new JoranConfigurator();
+        configurator.setContext(lc);
+        lc.reset();
+
+        try {
+            configurator.doConfigure(path);
+        } catch (JoranException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
     public static String getProterty(String key) {
         String value = null;
 
@@ -286,7 +307,7 @@ public class Utils {
         return properties;
     }
 
-    public void mergeFile(String sourceFilePath, String targetFilePath) {
+    public static void mergeFile(String sourceFilePath, String targetFilePath) {
         File sourceFile = new File(sourceFilePath);
         File targetFile = new File(targetFilePath);
 
@@ -323,16 +344,103 @@ public class Utils {
         }
     }
 
-    public List<Map<String, String>> matchedList (List<Map<String, String>> sourceList, List<Map<String, String>> targetList, String key) {
-        List<Map<String, String>> t = sourceList.stream().filter(target -> targetList.stream().anyMatch(source -> source.get(key).equals(target.get(key)))).collect(Collectors.toList());
+    public static List<Map<String, String>> matchedList (List<Map<String, String>> sourceList, List<Map<String, String>> targetList, String key) {
+        List<Map<String, String>> t = sourceList.stream().filter(target ->
+                targetList.stream().anyMatch(source -> source.get(key).equals(target.get(key)))).collect(Collectors.toList());
 
         return t;
     }
 
-    public List<Map<String, String>> removedList (List<Map<String, String>> sourceList, List<Map<String, String>> targetList, String key) {
+    public static List<Map<String, String>> removedList (List<Map<String, String>> sourceList, List<Map<String, String>> targetList, String key) {
         sourceList.removeIf(target -> targetList.stream().anyMatch(source -> source.get(key).equals(target.get(key))));
 
         return sourceList;
     }
 
+    public static Map<String, Object> putAll(Map<String, Object> target, Map<String, Object> source){
+        target.putAll(source);
+        return target;
+    }
+
+    /**
+     * <pre>
+     * 현재 날짜(또는 일자,시간)를 다양한 포멧으로 리턴한다.
+     * iCase
+     *  1 : yyyyMMddHHmmss
+     *  2 : yyyyMMddHHmm
+     *  3 : dd
+     *  4 : yyyyMMdd
+     *  5 : yyyy/MM/dd HH:mm:ss
+     *  6 : MM/dd HH:mm:ss
+     *  7 : HH
+     *  8 : mm
+     *  9 : HHmm
+     * </pre>
+     * @param iCase 숫자에 따라서 시간 포맷이 달라진다.
+     * */
+    static public String getTime(int iCase) {
+        Calendar cal = Calendar.getInstance(new Locale("Korean", "Korea"));
+        SimpleDateFormat df = null;
+
+        switch (iCase) {
+            case 1: df = new SimpleDateFormat("yyyyMMddHHmmss"); break;
+            case 2: df = new SimpleDateFormat("yyyyMMddHHmm");   break;
+            case 3: df = new SimpleDateFormat("yyyyMMddHH");     break;
+            case 4: df = new SimpleDateFormat("yyyyMMdd");       break;
+            case 5: df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss"); break;
+            case 6: df = new SimpleDateFormat("MM/dd HH:mm:ss"); break;
+            case 7: df = new SimpleDateFormat("HH");             break;
+            case 8: df = new SimpleDateFormat("mm");             break;
+            case 9: df = new SimpleDateFormat("mmss");           break;
+            case 10: df = new SimpleDateFormat("yyyyMM");        break;
+            default: break;
+        }
+
+        return df.format(cal.getTime());
+    }
+
+    static public int makeDirectory(String directoryPath) {
+        int retv = -1;
+
+        Path path = Paths.get(directoryPath);
+
+        try {
+            File directory = path.toFile();
+            if (directory.exists() == false) {
+                boolean t = directory.mkdirs();
+                if (t == true) {
+                    logger.info("success make directory {}", directory.getAbsolutePath());
+                    retv = 0;
+                } else {
+                    logger.info("failure make directory {}", directory.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+
+        return retv;
+    }
+
+    public static int writeToFile(String basePath,String fileName, String data) {
+        int retv = -1;
+
+        retv = makeDirectory(basePath);
+        if (retv < 0) {
+            return -2;  // 디렉토리생성 실패.
+        }
+
+        Path path = Paths.get(basePath, fileName);
+        File file = path.toFile();
+
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(data.getBytes());
+
+            retv = 0;
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+
+        return retv;
+    }
 }
