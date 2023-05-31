@@ -414,6 +414,8 @@ public class Utils {
                 } else {
                     logger.info("failure make directory {}", directory.getAbsolutePath());
                 }
+            } else {
+                retv = 0;
             }
         } catch (Exception e) {
             logger.error("", e);
@@ -422,7 +424,7 @@ public class Utils {
         return retv;
     }
 
-    public static int writeToFile(String basePath,String fileName, String data) {
+    public static int writeToFile(String basePath, String fileName, String data) {
         int retv = -1;
 
         retv = makeDirectory(basePath);
@@ -437,6 +439,8 @@ public class Utils {
             outputStream.write(data.getBytes());
 
             retv = 0;
+
+            logger.info("success write file {}", path.toFile().getAbsolutePath());
         } catch (Exception e) {
             logger.error("", e);
         }
