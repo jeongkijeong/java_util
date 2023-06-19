@@ -447,4 +447,43 @@ public class Utils {
 
         return retv;
     }
+
+    public static List<Map<String, Object>> filter(List<Map<String, Object>> targetList, String[] sourceFilter, String[] targetFilter) {
+        List<Map<String, Object>> resultList = null;
+
+        if (targetList == null || sourceFilter == null || targetFilter == null || targetList.size() == 0
+                || sourceFilter.length == 0 || targetFilter.length == 0) {
+            return targetList;
+        }
+
+        int sourceFilterSize = sourceFilter.length;
+        int targetFilterSize = targetFilter.length;
+
+        if (sourceFilterSize != targetFilterSize) {
+            return targetList;
+        }
+
+        try {
+            resultList = new ArrayList<>();
+
+            for (Map<String, Object> target : targetList) {
+                Map<String, Object> result = new HashMap<>();
+
+                for (int i = 0; i < sourceFilterSize; i++) {
+                    String key = sourceFilter[i];
+                    Object val = target.get(key);
+
+                    if (targetFilter != null) {
+                        result.put(targetFilter[i], val);
+                    } else {
+                        result.put(sourceFilter[i], val);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+
+        return resultList;
+    }
 }
